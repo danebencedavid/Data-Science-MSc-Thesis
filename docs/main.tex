@@ -103,13 +103,13 @@ $$q = k \cdot v$$
 \end{figure}
 \subsection{Forgalomáramlás modell}
 \subsubsection{Makroszkopikus}
-A makroszkopikus modellek a forgalom áramlását a mozgásban lévő folyadékokhoz vagy gázokhoz hasonlóan írják le.A dinamikai változók lokálisan aggregált mennyiségek, mint például a forgalomsűrűség $p(x,t)$, az áramlás $Q(x,t)$, az átlagsebesség $V(x,t)$.
+A makroszkopikus modellek a forgalom áramlását a mozgásban lévő folyadékokhoz vagy gázokhoz hasonlóan írják le. A dinamikai változók lokálisan aggregált mennyiségek, mint például a forgalomsűrűség $p(x,t)$, az áramlás $Q(x,t)$, az átlagsebesség $V(x,t)$.
 Mivel az aggregáció lokális, ezek a mennyiségek általában térben és időben változnak, azaz dinamikus mezőknek felelnek meg. Így a makroszkopikus modellek képesek leírni az olyan kollektív jelenségeket, régiók torlódása vagy forgalmi hullámok. Továbbá, a makroszkopikus modellek hasznosak,
 \begin{itemize}
     \item ha nem szükséges figyelembe venni olyan hatásokat, amelyeket makroszkopikusan nehéz leírni (pl. sávváltások, többféle vezető-jármű típus),
     \item ha csak makroszkopikus mennyiségek érdeklik az embert.
 \end{itemize}
-Egy makroszkopikus forgalomleírásban nem az egyedi járműveket írják le. Inkább az egyes útszakaszok aggregált változóit írják le. Azaz meg lehet határozni a sűrűséget, vagyis azt, hogy a járművek mennyire közel vannak egymáshoz térben, az áramlást, azaz az időegységenként egy referencia ponton áthaladó járművek számát és leírható a járművek átlagsebessége egy útszakaszon.
+Egy makroszkopikus forgalom leírásban nem az egyedi járműveket írják le, hanem az egyes útszakaszok aggregált változóit. Azaz meg lehet határozni a sűrűséget, vagyis azt, hogy a járművek mennyire közel vannak egymáshoz térben, az áramlást, azaz az időegységenként egy referencia ponton áthaladó járművek számát és leírható a járművek átlagsebessége egy útszakaszon.
 \begin{figure}[H]
     \centering
     \includegraphics[width=.5\linewidth]{Screenshot 2025-06-19 180354}
@@ -143,12 +143,58 @@ A megfelelő modell, vagy modellek kiválasztásakor (mezoszkopikus modell, amel
 A motorizált forgalomáramlás mellett a fentebb tárgyalt modellkeretekbe beilleszthető a nem motorizált forgalom dinamikája is. A nem motorizált forgalom magában foglalja a gyalogos, kerékpáros és vegyes forgalmat.  A járművekkel ellentétben a gyalogosok általában szabadon mozoghatnak két térdimenzióban, azaz két térbeli koordinátájuk van (x és y). A kívánt (járási) sebesség mellett minden gyalogosnak van egy kívánt iránya is. Következésképpen a kívánt sebesség vektorális mennyiség.
 \subsection{Autókövető modellek}
 Az autókövető modellek a mikroszkopikus forgalomáramlási modellek legfontosabb képviselői. Ezek egyedi vezető-jármű egységek szemszögéből írják le a forgalom dinamikáját. Szigorú értelemben az autókövető modellek csak a vezető viselkedését írják le más járművekkel való interakciók jelenlétében, míg a szabad forgalomáramlást külön modell írja le.
-Egy autókövető modell akkor teljes, ha képes leírni minden helyzetet, beleértve a szabad forgalomban való gyorsítást és utazósebességet, a többi jármű követését álló és nem álló helyzetekben, valamint a lassú vagy álló járművek, és a piros lámpák megközelítését.
+Egy autókövető modell akkor teljes, ha képes leírni minden helyzetet, beleértve a szabad forgalomban való gyorsítást és utazósebességet, a többi jármű követését álló és nem álló helyzetekben, valamint a lassú vagy álló járművek, és a piros lámpák megközelítését. A teljes modell gyorsulásra vonatkozó feltételei:
+\begin{enumerate}
+	\item A jármű mindig a kívánt sebessége felé törekszik. Minél gyorsabban megy már, annál kevésbé gyorsít, hogy elérje a célsebességét. Ha nincs más jármű előtte, akkor pontosan a kívánt sebességén fog haladni.
+	\item A jármű annál jobban gyorsít, minél messzebb van az előtte lévő jármű. Ha nagyon kicsi a távolság, csökkenti a sebességét, de ha senki sincs a hatótávolságán belül, a távolság már nem befolyásolja a gyorsítását; ekkor  az 1. pontban leírt módon gyorsít.
+	\item A jármű a legelöl haladó jármű sebességéhez igazodik. Minél gyorsabban megy az elöl haladó, annál jobban képes gyorsítani a hátul lévő jármű. Ha nagy a sebességkülönbség és gyorsan közeledik a vezetőhöz, akkor csökkentenie kell a gyorsulását a baleset elkerülése érdekében. Ha szabad az út, a vezető jármű sebessége nem befolyásolja a modell vezetési döntéseit.
+	\item A jármű álló helyzetben is megtart egy minimális távolságot az előtte lévő járműtől. Ha megállt, akkor nem gyorsít, és még akkor sem mozog hátra, ha valamilyen múltbeli esemény miatt (pl. hirtelen fékezés) a távolság kisebb lett a biztonságos minimumnál.
+\end{enumerate}
 A modellezett cselekvésektől függően megkülönböztetünk \textit{gyorsulási modelleket} a longitudinális mozgáshoz, \textit{sávváltási modelleket} a laterális mozgáshoz, és \textit{döntési modelleket} más diszkrét választási helyzetekhez, mint például egy elsőbbségi útra való behajtás.
+\subsubsection{Gipps Modell}
+A Gipps Modell az egyik legegyszerűbb teljes, baleset-mentes modell, annak ellenére is, hogy irreális gyorsítási profilt eredményez.
+A balesetek megelőzése érdekében egy $v_{safe}(s,v_l)$ biztonságos sebességet vezet be, amely az elöl haladó jármű sebességétől és távolságától függ. Ez következő feltételezéseken alapul:
+	\begin{enumerate}
+	\item A fékezési manővereket mindig konstans $b$ lassítással hajtják végre. Nincs különbség kényelmes és maximális lassulás között.
+	\item Létezik egy állandó $\Delta t$ reakció idő.
+	\item Még akkor is, ha az elöl haladó jármű hirtelen teljesen lelassít, a távolságkülönbség az elöl haladó járműhöz képest nem lehet kisebb egy $\mathbf{s}_0$ minimális távolságnál.
+	\end{enumerate}
+Az 1. feltételezésből következik, hogy a féktávolság, amelyre az elöl haladó járműnek szüksége van egy teljes megálláshoz:
+\[ \Delta x_l = \frac{v_l^2}{2b}\]
+\\
+A 2. feltételezésből következik, hogy a teljes megálláshoz a féktávolság mellett egy $v\Delta t$ reakciótávolságra is szükség van.
+\[ \Delta x = v\Delta t + \frac{v_l^2}{2b}\]
+\\
+Végül a 3. feltételezés teljesül, ha az $\mathbf{s}$ távolságkülönbség meghaladja a szükséges $\mathbf{s}_0$ minimális végső értéket a $\Delta x - \Delta x_l$ különbséggel, ami a vizsgált jármű megállási távolsága és az elöl haladó jármű féktávolsága közötti különbség:
+$$s \ge s_0 + v\Delta t + \frac{v^2}{2b} - \frac{v_l^2}{2b}$$
+Az a $\mathbf{v}$ sebesség, amelyre az egyenlőség teljesül, határozza meg a „biztonságos sebességet”:$$v_{safe}(s, v_l) = -b\Delta t + \sqrt{b^2\Delta t^2 + v_l^2 + 2b(s - s_0)}$$
+
+A Gipps-modell egy iterált leképezésként van definiálva, amelynek fő eleme a „biztonságos sebesség”:
+$$v(t + \Delta t) = \min [v + a\Delta t, v_0, v_{safe}(s, v_l)]$$
+\subsubsection{IDM - Intelligent Driver Model}
+Az IDM is egy alap feltételezéseken nyugvó modell:
+\begin{enumerate}
+	\item Teljesíti a teljes modell gyorsulásra vonatkozó feltételeit.
+	\item A lökhárító-lökhárító távolság az elöl haladó járműhöz képest nem kisebb, mint egy „biztonsági távolság” $s_0 + vT$, ahol $s_0$ egy minimális (lökhárító-lökhárító) távolságkülönbség, és $T$ az elöl haladó járműhöz viszonyított (lökhárító-lökhárító) időrés.
+	\item Egy intelligens fékezési stratégia szabályozza, hogyan közelítik meg a lassabb járműveket (vagy akadályokat, piros lámpákat):
+	\begin{itemize}
+		\item	Normál körülmények között a fékezési manőver „lágy”, azaz a lassulás fokozatosan növekszik egy kényelmes $b$ értékre, és nullára csökken közvetlenül azelőtt, hogy még egy  gépjárműkövetési helyzetbe érkezne, vagy teljesen megállna.
+		\item Kritikus helyzetben a lassulás meghaladja a kényelmes értéket, amíg a veszély el nem hárul. A fennmaradó fékezési manőver (amennyiben alkalmazható) a szokásos kényelmes $b$ lassulással folytatódik.
+	\end{itemize}
+	\item Az átmenetek a különböző vezetési módok között (pl. a gyorsításból a gépjárműkövetési módba) simák.
+	\item A modellnek a lehető legtakarékosabbnak kell lennie. Minden modellparaméternek csak a vezetési viselkedés egy aspektusát szabad leírnia.
+\end{enumerate}
+A szükséges tulajdonságokat a következő gyorsulási egyenlet valósítja meg:$$\dot{v} = a \left[1 - \left(\frac{v}{v_0}\right)^\delta - \left(\frac{s^*(v, \Delta v)}{s}\right)^2 \right]$$
+Az IDM gyorsulása az $\mathbf{\tilde{a}}_{mic}(s, v, \Delta v)$ formában van megadva, és két részből áll: az egyik a pillanatnyi $v$ sebességet veti össze a ${v}_0$ kívánt sebességgel, a másik pedig a pillanatnyi $s$ távolságot veti össze a $s^*$ kívánt távolsággal.
+\\
+A kívánt távolság
+$$s^*(v, \Delta v) = s_0 + \max \left[0, vT + \frac{v\Delta v}{2\sqrt{ab}}\right]$$
+egy $s_0 + vT$ egyensúlyi taggal és egy $v\Delta v / (2\sqrt{ab})$ dinamikus taggal rendelkezik, amely az intelligens fékezési stratégiát valósítja meg.
 \subsection{Lane-Changing Models}
 \subsection{Public Transport Models}
 \subsection{Discrete-Event Simulation (DES)}
 \subsection{Modeling Random Events}
+\subsection{Bottlenecks, fixed vs dynamic}
 \subsection{Summary:How these models interact in your system, Which agents use which model,
 	How this sets the stage for your architecture}
 
