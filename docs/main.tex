@@ -13,6 +13,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{comment}
+
 
 % Címlaphoz pozícionáláshoz
 \usepackage{tikz}
@@ -85,7 +88,7 @@ Ezért egy olyan szimulációs rendszer, amely a valósághoz közelítő módon
 A diplomamunka célja egy adat által irányított, városi közlekedést modellező szimulációs rendszer létrehozása ami különösen hangsúlyozza a közösségi közlekedésjárművek, buszok és villamosok viselkedését, hálózati hatásait és késések terjedését.
 A dolgozat középponti kérdései a következők: hogyan lehet különféle forrásból (pl. OpenStreetMap, GTFS) származó adatokat egyesíteni és feldolgozni úgy, hogy azok alapként szolgálhassanak egy valóságszerű közlekedési szimulációhoz? Miként képes egy közlekedési jármű késése - akár pár perces is -, láncreakciót okozni a teljes hálózaton? Hogyan lehet ezt a hatást modellezni és vizualizálni?
 \\
-A szimulációs motor alapja a diszkrét események által vezérelt időbeli történések (pl. megállások, balesetek, útlezárások). Különböző matematikai modellek kerülnek bemutatásra és alkalmazásra (jármű követés, sávváltás) az egyes járművekhez, illetve véletlenszerű események generálódnak Markov-láncokat használva.
+A szimulációs motor alapja a diszkrét események által vezérelt időbeli történések (pl. megállások, balesetek, útlezárások). Különböző matematikai modellek kerülnek bemutatásra és alkalmazásra (autó követés, sávváltás) az egyes járművekhez, illetve véletlenszerű események generálódnak Markov-láncokat használva.
 \\
 A program célja egy valós térképalapú vizualizációval rendelkező szimulációs eszköz, amely különböző szcenáriók (pl. csúcsforgalom, ünnepnap, baleset, időjárás) hatásait tudja bemutatni. A felhasználói felület lehetővé teszi a szimuláció futtatását különböző paraméterekkel, valamint az egyes járművek viselkedésének és késéseinek nyomon követését.
 \section{Elméleti háttér}
@@ -136,7 +139,7 @@ A megfelelő modell, vagy modellek kiválasztásakor (mezoszkopikus modell, amel
 	\item \textit{Sztochasztikus} és \textit{Determinisztikus} modellek. A véletlen elemek felhasználhatók a forgalomáramlás olyan aspektusainak leírására, amelyek ismeretlenek, mérhetetlenek, modellezhetetlenek, vagy „valóban” véletlenszerűek. Míg a véletlen elemeket nem tartalmazó modelleket \textit{determinisztikus} modelleknek nevezzük, addig azokat, amelyek véletlen elemeket (sztochasztikus tagokat) tartalmaznak, \textit{sztochasztikus} modelleknek hívjuk.A véletlenszerűség a modell különböző pontjain előfordulhat:
 	\begin{itemize}
 		\item gyorsulási zaj, amely a emberi viselkedés kiszámíthatatlanságát modellezi
-		\item exogén zaj, amelyet a bemeneti adatokhoz adnak hozzá, és az emberi érzékelési és becslési hibáinak modellezésére szolgál 
+		\item külső zaj, amelyet a bemeneti adatokhoz adnak hozzá, és az emberi érzékelési és becslési hibáinak modellezésére szolgál 
 	\end{itemize}
 	\item \textit{Egysávos} és \textit{Többsávos} modellek. Ha a forgalomáramlási modell több sávot és a köztük lévő sávváltásokat is leírja, akkor két fő komponensből áll: a longitudinális dinamikából (gyorsulási modell) és a laterális dinamikából (sávváltási modell). Egyes modellek eredendően tartalmazzák a laterális dinamikát, míg a tisztán longitudinális modellek kiegészíthetők egy megfelelő sávváltási modellel.
 \end{itemize}
@@ -189,15 +192,67 @@ Az IDM gyorsulása az $\mathbf{\tilde{a}}_{mic}(s, v, \Delta v)$ formában van m
 \\
 A kívánt távolság
 $$s^*(v, \Delta v) = s_0 + \max \left[0, vT + \frac{v\Delta v}{2\sqrt{ab}}\right]$$
-egy $s_0 + vT$ egyensúlyi taggal és egy $v\Delta v / (2\sqrt{ab})$ dinamikus taggal rendelkezik, amely az intelligens fékezési stratégiát valósítja meg.
-\subsection{Lane-Changing Models}
+egy $s_0 + vT$ egyensúlyi taggal és egy $v\Delta v / (2\sqrt{ab})$ dinamikus taggal rendelkezik, amely az intelligens fékezési stratégiát valósítja meg. A modell paraméterei bizonyos helyzetekben:
+\begin{itemize}
+	\item Maximális gyorsulás ($a$): Álló helyzetből indulva a jármű a maximális $a$ gyorsulással kezd. Ahogy a sebesség nő, a gyorsulás fokozatosan csökken, és nullához közelít, amikor a jármű eléri a kívánt sebességét (${v}_0$). A $\delta$ kitevő szabályozza sebességcsökkenést.
+	\item Biztonsági távolság: Amikor a jármű egy másik autót követ, a köztük lévő távolság megközelítőleg megegyezik a biztonsági távolsággal (${s}_0 + vT$).
+	\item Kényelmes lassulás ($b$): Amikor a vezető lassabb vagy megállt járművekhez közeledik, a lassulás általában nem haladja meg a $b$ kényelmes lassulás értékét.
+\end{itemize}
+Az IDM kívánt távolság ($s^*$) képletében lévő $v\Delta v / (2\sqrt{ab})$ tag a vezető jármű megközelítésekor fellépő dinamikus viselkedést modellezi. Amikor egy álló járművet vagy piros lámpát közelítünk meg ($\Delta v = v$), a gyorsulás egyenlete a következőformát ölti:
+$$
+\dot{v} = -a \left(\frac{s^*}{s}\right)^2 = - \frac{av^2(\Delta v)^2}{4abs^2} = - \left(\frac{v^2}{2s}\right)^2 \frac{1}{b}
+$$
+, ahol a kinematikai lassulás (${b}_{kin}$):
+$$b_{kin} = \frac{v^2}{2s}. $$
+A ${b}_{kin}$ kinematikai lassulás az a minimális lassulás, amely pontosan ahhoz szükséges, hogy elkerüljük az ütközést az előttünk lévő járművel, ha az a pillanatnyi ${s}$ távolságon van. Ha ezzel a ${b}_{kin}$ lassulással fékezünk, a féktávolságunk pontosan megegyezik a vezető járműhöz fennálló távolsággal.
+\subsubsection{Emberi faktor}
+Az autókövető modellek bemeneti változói korlátozzák a szimuláció realitását, mert:
+\begin{itemize}
+	\item Csak a közvetlenül előtte haladó járművet veszi figyelembe
+	\item Figyelmen kívül hagyja a környezeti körülményeket, szomszédos sávban haladókat
+	\item Nem figyel a féklámpára, irányjelzőre és dudaszóra	
+\end{itemize}
+Ahhoz, hogy az emberi viselkedés valósághűen modellezhető legyen, a következő jellemzők kerülnek bevezetésre:
+\begin{enumerate}
+	\item \textit{Véges reakcióidő}. A reakcióidő három részből áll: mentális feldolgozási idő (észlelés, döntés), mozgási idő (pedálcsere) és a jármű technikai válaszideje. A modellezésben a reakcióidő általában konstans, $\approx 1$ másodperc értéket vesz fel.
+	\item \textit{Becslési hibák}.  A vezetők pontatlanul becsülik meg a távolságot és az elöl haladó sebességét.
+	\item \textit{Előrelátás}. A vezető figyelembe veszi a következő-legközelebbi és a távolabbi járműveket, illetve féklámpák, irányjelzők és dudák bemeneti jelként megjelennek.
+	\item \textit{Kontextus}. A vezetési stílus függ a jelenlegi és a múltbeli általános forgalmi helyzettől. Például, ha a vezető egy ideig zsúfolt forgalomban haladt, az időbeli követési távolság az elöl haladó járműhöz képest megnő, és a vezető ébersége csökken. Ezzel szemben, amikor sávlezáráshoz közelít, a vezetők lazábban reagálnak a sávba betolakodó járművekre, és átmenetileg elfogadnak a szokásosnál kisebb időbeli távolságot.
+	\item \textit{Együttműködés}. Az vezetők ezen aspektusa fontos a kötelező sávváltással járó helyzetekben: A vezetők kimozognak a belső sávból, vagy fékeznek (vagy gyorsítanak), hogy helyet csináljanak más vezetők számára.
+\end{enumerate}
+\subsection{Sávváltási modellek}
+A forgalomáramlás modellezése során diszkrét választási helyzetek merülnek fel, mint például annak eldöntése, hogy biztonságos-e behajtani egy elsőbbségi útra, vagy hogy a járművezető helyes reakciója a haladás vagy a megállás-e egy forgalmi lámpához közeledve, amely hamarosan pirosra vált.
+\subsubsection{Általános döntési modell}
+Feltételezzük, hogy egy adott pillanatban a vezető választhat az alternatívák $K$ diszkrét halmazából. A sávváltások kontextusában az alternatívák az (aktív) döntések lennének a balra vagy jobbra történő sávváltásra, és a (passzív) döntés a sávváltás elmulasztására. Amikor egy elsőbbségi útra készül behajtani, az alternatívák a beolvadás kezdeményezése, vagy a megállás és a várakozás a megfelelő résre a főúti járművek között. Feltételezzük, hogy a vezetők tisztában vannak döntéseik következményeivel, azaz képesek előre látni, minden alternatíva esetében, az összes érintett jármű sebességét és távolságát. Ez lehetővé teszi számunkra, hogy kiszámítsuk a hasznosságokat. A döntési folyamatban a vezető maximalizálja hasznosságát, feltéve, hogy a cselekvés biztonságos.
+\\
+\textbf{Biztonság kritérium.} Egyik vezetőnek ($\beta$) sem, akit a $k$ alternatíva választásának következményei érintenek (beleértve az $\alpha$ döntéshozót is), kell kritikus manővert végrehajtania a $k$ alternatíva melletti döntés következtében. Egy manőver kritikusnak minősül, ha a fékezési lassulások meghaladják a biztonságos lassulást.
+\\
+\textbf{Önsztönző kritérium.} Az összes biztonságos $k'$ alternatíva közül választva, az $\alpha$ vezető a maximális hasznosságú opciót választja.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.5\linewidth]{Screenshot 2025-11-23 122720}
+	\caption{A kép az általános sávváltási döntési modell jelöléseit mutatja be, amely a hasznosság maximalizálása elvén alapul, figyelembe véve egyidejűleg a biztonsági kritériumokat. A $\alpha$ jármű a középső sávból próbál balra sávot váltani. A $\hat{v}$ és $\hat{s}$ jelölések az új, lehetséges helyzetet írják le, amely a sávváltás után jönne létre, biztosítva, hogy a manőver ne kényszerítsen senkit kritikus fékezésre, és maximális előnyt jelentsen $\alpha$ számára. \cite{ref2}.}
+	\label{fig:lane-change}
+\end{figure}
+\subsubsection{MOBIL}
+A modell a \textit{biztonság} és \textit{ösztönző} kritériumok mellett, kiegészül egy \textit{udvariasság faktorral} $(p)$, amely figyelembe veszi a másokra rótt hátrányt.
+
+$$\hat{a}_{\alpha} - a_{\alpha} + p \sum_{\beta \in \{\text{érintett}\}} (\hat{a}_{\beta} - a_{\beta}) > \Delta a + a_{\text{bias}}$$
+
+\begin{itemize}
+	\item $\hat{a}_{\alpha} - a_{\alpha}$: A döntéshozó ($\alpha$) saját hasznossága, a sávváltásból származó előny.
+	\item $p \sum_{\beta \in \{\text{érintett}\}} (\hat{a}_{\beta} - a_{\beta})$: Az érintett járművek gyorsulásában bekövetkező változások (a hátrány) udvariassági faktorral ($p$) súlyozva. A negatív különbség (lassulás) a többi jármű számára hátrányt jelent.
+	\item $\Delta a + a_{\text{bias}}$: A sávváltáshoz szükséges minimális elvárható előny.
+\end{itemize}
+
+\begin{comment}
 \subsection{Public Transport Models}
 \subsection{Discrete-Event Simulation (DES)}
 \subsection{Modeling Random Events}
 \subsection{Bottlenecks, fixed vs dynamic}
 \subsection{Summary:How these models interact in your system, Which agents use which model,
 	How this sets the stage for your architecture}
-
+\end{comment}
 \section{Összefoglalás}
 Röviden, tömören és világosan ismertetni kell a fontosabb megállapításokat és következtetéseket.
 
