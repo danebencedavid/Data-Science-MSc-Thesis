@@ -253,14 +253,105 @@ $$\hat{a}_{\alpha} - a_{\alpha} + p \sum_{\beta \in \{\text{érintett}\}} (\hat{
 \subsection{Summary:How these models interact in your system, Which agents use which model,
 	How this sets the stage for your architecture}
 \end{comment}
+\section{Időjárás}
+Az időjárási körülmények a bizonytalanság egyik legfőbb forrását jelenti a városi közlekedésben. Ellentétben az infrastruktúrával - amely lassan változik, az időjárás hirtelen és jelentős mértékben képes módosítani a forgalmi viszonyokat. Mind \cite{ref4} és \cite{ref6} kutatás azt igazolja, hogy a kedvezőtlen időjárás, eső, hó, köd vagy szélsőséges hőmérséklet az útkapacitás és járműsebesség csökkenéséhez, valamint az úthálózat romlásához vezet. Ezzel párhuzamosan növekszik a baleseti kockázat.
+Városi környezetben, ahol a forgalmi igény csúcsidőszakokban gyakran meghaladja a rendelkezésre álló kapacitást, még a mérsékelt időjárási zavarok is torlódásokat okozhatnak.
+\\
+A forgalomszimulációkban az időjárást általában diszkrét állapotok (tiszta idő, eső, köd, hó) segítségével reprezentálják, amelyek mindegyikéhez specifikus forgalomáramlási paraméterek tartoznak. A megfigyelések azt mutatják hogy a csapadék mérhetően csökkenti az áramlási sebességet és növeli az időbeli követési távolságot, \cite{ref4} szerint a kedvezőtlen időjárási viszonyok átlagosan $18\%$-os növekedést okoznak a késések terén. Esetleges hóesésnél pedig, \cite{ref6} megfigyelése alapján az átlagsebesség akár $40\%$-kal, a forgalom volumene pedig több mint $10\%$-kal visszaeshet.
+\\
+Az időjárás elsősorban kettő mechanizmuson keresztül befolyásolja a forgalomáramlást:
+\begin{enumerate}
+	\item Sebességcsökkenés: A vezetők a romló látási viszonyok és csökkenő tapadás miatt módosítják a vezetési viselkedésüket.
+	\item Kapacitáscsökkenés: A megnövekedett követési távolságok és az óvatosabb vezetői magatartás következménye. 
+\end{enumerate}
+\cite{ref6} kimutatta, hogy sebesség-forgalom (speed-flow) összefüggés esős időben lefelé tolódik el, ami azt jelenti, hogy adott forgalmi sűrűség mellett elérhető sebesség alacsonyabb, mint száraz körülmények között. Ez a hatás fontossá válik a csúcsidőszakokban.
+Szoros összefüggés áll fenn az időjárási körülmények és a balesetek bekövetkezése között. \cite{ref7} alapján a balesetek gyakorisága jelentősen megnő esőben és hóban a tiszta időhöz képest.
+
+A szakirodalom alátámasztja, hogy az időjárást, mint állapotváltózót be kell vonni a forgalomszimulációba, mert az befolyásolja a teljesítményt, biztonságot és megbízhatóságot.
+Viszont azok a modellek és rendszerek, amelyek mellőzik az időjárási hatásokat, rendszerint alulbecsülik a torlódásokat és az utazási idők változását, főleg csúcsidőszakokban \cite{ref6}.
+
+\section{Bottleneck és hatásai}
+A városi hálózatok torlódásait elsősorban \textit{bottleneck}-ek határozzák meg. Ezek két fő csoportra bonthatók:
+\begin{itemize}
+	\item Ismétlődő. Geometriai adottságok (sávszűkület, felhajtók) vagy szabályozási korlátok (jelzőlámpák) miatt alakulnak ki. Ezek napi mintázatot alkotnak a forgalmi igények tekintetében.
+	\item Nem ismétlődő. Váratlan események, balesetek vagy műszaki hibák okozzák. Ezek helyszíne és időpontja véletlenszerű.
+\end{itemize}
+
+A balesetek jelentős mértékben csökkentik az útkapacitást: egyetlen sáv lezárása egy többsávos úton akár az áteresztőképesség több mint 50\%-os csökkenésével járhat.
+
+\subsection{Lökéshullám-elmélet}
+A torlódások dinamikájának és a sorok térbeli kiterjedésének modellezésére a lökéshullám-elmélet van használva. Ez azt feltételezi, hogy a járművek a sebességüket pillanatszerűen változtatják meg egy határvonalon, amelyet lökéshullámnak nevezünk.
+Adott a forgalomáramlás alapösszefüggése:
+$$ q = k \cdot v $$
+Ahol a $k$ a sűrűség és a $v$ a sebesség.
+A két forgalmi állapot (például nem-torlódott A és torlódott B állapot) közötti lökéshullám($w$) sebességét a következő képlet adja meg:
+$$ w = \frac{q_A - q_B}{k_A - k_B} = \frac{\Delta q}{\Delta k}$$
+
+Ez a sebesség a lökéshullám meredekségét jelenti, ha $w$ negatív, akkor a torlódás az áramlással szemben felfelé terjed. Az egyenlet alkalmazható mind rögzített, mind mozgó bottleneck-ek esetén is:
+\begin{itemize}
+	\item Rögzített. Ide tartoznak a balesetek vagy útépítések.
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=.5\linewidth]{temp_bneck.png}
+			\cite{ref3}
+			\label{fig:temp_bneck}
+		\end{figure}
+	\item Mozgó. Lassú járművek (mezőgazdasági gépek, konvojok) okozzák. Ebben az esetben a lökéshullám sebessége megegyezik a mozgó akadály sebességével. A torlódás azért alakul ki, mert a járművek felhalmozódnak a lassú jármű mögötti területen.
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=.5\linewidth]{move_bneck.png}
+			\cite{ref3}
+			\label{fig:move_bneck}
+		\end{figure}
+\end{itemize}
+
+\section{Véletlenszerű események}
 \section{Összefoglalás}
 Röviden, tömören és világosan ismertetni kell a fontosabb megállapításokat és következtetéseket.
 
 \section{Irodalomjegyzék}
+
 \begin{thebibliography}{9}
-\bibitem{ref1} Dr. Tom V. Mathew. Fundamental relation of traffic flow. 
-\bibitem{ref2} Treiber, M. and Kesting, A. (2013) Traffic Flow Dynamics: Data, Models and Simulation. Springer.
-\bibitem{ref3} Victor L. Knoop, (2018) Traffic Flow Theory: An Introduction with Exercises. TU Delft Open.
+	
+	\bibitem{ref1}
+	Mathew, T. V.  
+	\textit{Fundamental Relation of Traffic Flow}.  
+	NPTEL, Indian Institute of Technology Bombay.
+	
+	\bibitem{ref2}
+	Treiber, M. and Kesting, A. (2013).  
+	\textit{Traffic Flow Dynamics: Data, Models and Simulation}.  
+	Springer-Verlag, Berlin.
+	
+	\bibitem{ref3}
+	Knoop, V. L. (2018).  
+	\textit{Traffic Flow Theory: An Introduction with Exercises}.  
+	TU Delft Open.
+	
+	\bibitem{ref4}
+	Chen, C., Zhao, X., Liu, H., Ren, G., Zhang, Y., and Liu, X. (2019).  
+	Assessing the influence of adverse weather on traffic flow characteristics using a driving simulator and VISSIM.  
+	\textit{Sustainability}, 11(3), 830.
+	
+	\bibitem{ref5}
+	Rakha, H., Farzaneh, M., Arafeh, M., and Sterzin, E. (2012).  
+	Inclement weather impacts on freeway traffic stream behavior.  
+	\textit{International Journal of Transportation Science and Technology}, 1(1), 25--42.
+	
+	\bibitem{ref6}
+	Becker, N., Gerike, R., and Axhausen, K. W. (2022).  
+	Modeling hourly weather-related road traffic variations for federal roads in Germany.  
+	\textit{European Transport Research Review}, 14(1).
+	
+	\bibitem{ref7}
+	Qiu, L., Nixon, W. A. (2008).
+	Effects of Adverse Weather on Traffic Crashes: Systematic Review and Meta-Analysis.
+	\textit{Transportation Research Record, 2055, 139–146.}
+	
+	
+	
 \end{thebibliography}
+
+
 
 \end{document}
