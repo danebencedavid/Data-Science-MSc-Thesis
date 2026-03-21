@@ -15,7 +15,9 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{comment}
-
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{tabularx}
 
 % Címlaphoz pozícionáláshoz
 \usepackage{tikz}
@@ -107,7 +109,7 @@ $$q = k \cdot v$$
 \subsection{Forgalomáramlás modell}
 \subsubsection{Makroszkopikus}
 A makroszkopikus modellek a forgalom áramlását a mozgásban lévő folyadékokhoz vagy gázokhoz hasonlóan írják le. A dinamikai változók lokálisan aggregált mennyiségek, mint például a forgalomsűrűség $p(x,t)$, az áramlás $Q(x,t)$, az átlagsebesség $V(x,t)$.
-Mivel az aggregáció lokális, ezek a mennyiségek általában térben és időben változnak, azaz dinamikus mezőknek felelnek meg. Így a makroszkopikus modellek képesek leírni az olyan kollektív jelenségeket, régiók torlódása vagy forgalmi hullámok. Továbbá, a makroszkopikus modellek hasznosak,
+Mivel az aggregáció lokális, ezek a mennyiségek általában térben és időben változnak, azaz dinamikus mezőknek felelnek meg. Így a makroszkopikus modellek képesek leírni az olyan kollektív jelenségeket, mint a régiók torlódása vagy forgalmi hullámok. Továbbá, a makroszkopikus modellek hasznosak,
 \begin{itemize}
     \item ha nem szükséges figyelembe venni olyan hatásokat, amelyeket makroszkopikusan nehéz leírni (pl. sávváltások, többféle vezető-jármű típus),
     \item ha csak makroszkopikus mennyiségek érdeklik az embert.
@@ -120,7 +122,7 @@ Egy makroszkopikus forgalom leírásban nem az egyedi járműveket írják le, h
     \label{fig:makro-model}
 \end{figure}
 \subsubsection{Mikroszkopikus}
-A mikroszkopikus modellek, beleértve az autókövető modelleket, az egyéni járműveket írják, melyek együttesen alkotják a forgalom áramlását. Egy járműről teljes információt a trajektóriája ad, azaz a jármű pozíciójának minden időpillanatban történő meghatározása. A modellek a környező forgalomtól függően mutatják be az egyes vezetők reakcióját (gyorsítás, fékezés, sávváltás).  dinamikai változók a járművek pozíciói $x_{\alpha}(t)$, sebességei $v_{\alpha}(t)$ és gyorsulásai $\dot{v}_{\alpha}(t)$. A mikroszkopikus modellek alkalmasak a következő alkalmazásokra:
+A mikroszkopikus modellek, beleértve az autókövető modelleket, az egyéni járműveket írják, melyek együttesen alkotják a forgalom áramlását. Egy járműről teljes információt a trajektóriája ad, azaz a jármű pozíciójának minden időpillanatban történő meghatározása. A modellek a környező forgalomtól függően mutatják be az egyes vezetők reakcióját (gyorsítás, fékezés, sávváltás). Dinamikai változók a járművek pozíciói $x_{\alpha}(t)$, sebességei $v_{\alpha}(t)$ és gyorsulásai $\dot{v}_{\alpha}(t)$. A mikroszkopikus modellek alkalmasak a következő alkalmazásokra:
 \begin{itemize}
 	\item Az egyedi járművek forgalomra gyakorolt hatásának modellezése,
 	\item Olyan helyzetek, amelyekben a forgalom heterogenitása fontos szerepet játszik, pl. a sebességkorlátozások vagy teherautók előzési tilalmának hatásainak szimulálása,
@@ -245,14 +247,6 @@ $$\hat{a}_{\alpha} - a_{\alpha} + p \sum_{\beta \in \{\text{érintett}\}} (\hat{
 	\item $\Delta a + a_{\text{bias}}$: A sávváltáshoz szükséges minimális elvárható előny.
 \end{itemize}
 
-\begin{comment}
-\subsection{Public Transport Models}
-\subsection{Discrete-Event Simulation (DES)}
-\subsection{Modeling Random Events}
-\subsection{Bottlenecks, fixed vs dynamic}
-\subsection{Summary:How these models interact in your system, Which agents use which model,
-	How this sets the stage for your architecture}
-\end{comment}
 \section{Időjárás}
 Az időjárási körülmények a bizonytalanság egyik legfőbb forrását jelenti a városi közlekedésben. Ellentétben az infrastruktúrával - amely lassan változik, az időjárás hirtelen és jelentős mértékben képes módosítani a forgalmi viszonyokat. Mind \cite{ref4} és \cite{ref6} kutatás azt igazolja, hogy a kedvezőtlen időjárás, eső, hó, köd vagy szélsőséges hőmérséklet az útkapacitás és járműsebesség csökkenéséhez, valamint az úthálózat romlásához vezet. Ezzel párhuzamosan növekszik a baleseti kockázat.
 Városi környezetben, ahol a forgalmi igény csúcsidőszakokban gyakran meghaladja a rendelkezésre álló kapacitást, még a mérsékelt időjárási zavarok is torlódásokat okozhatnak.
@@ -305,12 +299,204 @@ Ez a sebesség a lökéshullám meredekségét jelenti, ha $w$ negatív, akkor a
 		\end{figure}
 \end{itemize}
 
-\section{Véletlenszerű események}
-\section{Összefoglalás}
-Röviden, tömören és világosan ismertetni kell a fontosabb megállapításokat és következtetéseket.
+\section{Közösségi közlekedés}
+A közösségi közlekedési rendszer ugyanabban a városi ökoszisztémában üzemel, mint az egyéni járművek, ebből adódóan ki van téve a városi környezet minden bizonytalansági tényezőjének.
 
+A rögzített útvonalhálózat, menetrendi kényszerek, a megállóhelyi utascsere folyamatok és a járművek kapacitáskorlátai miatt az egyéni járművek szimulációjától eltérő megközelítést igényel. A közösségi közlekedési járművek működése diszkrét események sorozataként írható le, ahol a legfontosabb események a megállóba érkezés, a várakozási idő és az indulás. Az utasforgalmi teher időfüggő természete miatt a várakozási idő a csúcsidőszakokban megnövekedhet. Amikor egy jármű késik, a következő megállóban több utas halmozódik fel, ami tovább növeli a várakozási időt. Ez egy öngerjesztő folyamatot indít el, amely járművek torlódásához vezet. Ekkor a késésben lévő járművet az utána következő, kevesebb utast szállító jármű beéri, és konvojban haladnak tovább, ami csökkenti a vonal kapacitását és növeli az utasok várakozási idejét.
+
+Mind a buszok, mind a villamosok elválaszthatatlanok az egyéni gépjárműforgalomtól, hiszen ugyanazon infrastruktúrát és hálózatot használják, emiatt a közösségi közlekedés járművei szintén résztvevői a torlódásoknak, főleg ha hiányzik a kijelölt buszsáv. A szimuláció sorén figyelembe kell venni, hogy a buszok és villamosok jelenléte is egy faktor forgalom áramlás befolyásolásában, a gyakori megállások és a fizikai méretből adódó mögöttes torlódás miatt.
+
+Az időjárási körülmények bár csökkentik az útkapacitást és lassul a haladási sebesség, viszont emiatt növekszik az utasforgalmi igény. A közösségi közlekedés teljesítményének javítására alkalmazható a dedikált buszsáv, jelzőlámpa prioritás vagy meghosszabbított sávok, amelyekkel kikerülhetők a feltorlódások.
+
+\section{A szimulációs rendszer gyakorlati megvalósítása}
+\subsection{Architektúra és működés}
+A szimulációs rendszer létrehozásakor cél a közlekedési folyamatok mikroszkopikus modellezése, különböző szcenáriók vizsgálata és a szimuláció vizuális megjelenítése. Rétegelt, hibrid szimulációs-vizualizációs struktúra biztosítja a funkcionális komponensek elkülönülését, illetve a jövőbeli bővíthetőségét. A rendszer alapelve, hogy a szimulációs állapot egyetlen helyen, a szimulációs motorban kerül kezelésre, míg a többi komponens csak olvashatja ezt az állapotot. A rendszer főbb logikai egységei:
+\begin{enumerate}
+    \item \textit{Hálózati réteg}. Ez a réteg felelős az úthálózat topológiai reprezentációjáért és az útvonaltervezésért. A közlekedési hálózat egy irányított gráf, ahol a csúcsok a kereszteződések, az élek pedig az útszakaszok. Az élek olyan attribútumokkal rendelkeznek, mint az útszakasz hossza, a megengedett sebesség és az élhez tartozó geometriai információ.
+    A routing műveletek során az élekhez rendelt súlyok reprezentálják az útszakasz használatának költéségét. Ez a költség az útszakasz bejárásához szükséges becsült idő. A hálózati réteg nem tartalmaz járműspecifikus viselkedési logikát, Amennyiben egy útszakaszon baleset történik, vagy egyéb akadály jelenik meg, akkor az adott élhez tartozó súly módosul.
+    \item \textit{Ágens réteg}. Minden jármű egy önálló entitás, saját állapottal és döntési mechanizmussal. Az ágens réteg felelős ezeknek a járműveknek a reprezentációjáért is viselkedésének modellezéséért.
+    Minden jármű rendelkezik egy aktuális pozícióval az úthálózaton, sebességgel, követendő útvonallal valamint a vezetési profilhoz tartozó paraméterekkel. Az ágens egyik legfontosabb feladata a vezető jármű azonosítása, az adott útszakaszon haladó járművek között mindig meghatározható, az a jármű amely az aktuális előtt halad. Ez az információ kerül felhasználásra az autókövető modellnél.
+    \item \textit{Modellezési réteg}. Ez réteg felelős a matematikai modellek implementálásáért, amelyek a járművek döntéseit és mozgását írják le. Ide tartozik az autókövető modell, sávváltási döntési mechanizmus és a környezeti tényezőket figyelembe vevő paraméter. A viselkedési logika és a szimulációs motor független egymástól. A réteg feladatai közé tartozik még a gyorsulás kiszámolása (aktuális sebesség, követési távolság és a vezető jármű sebessége alapján).
+    \item \textit{Szimulációs réteg}. A rendszer központi eleme a szimulációs motor, amely a diszkrét eseményvezérelt működést valósítja meg. A szimulációs idő nem folytonosan halad előre, hanem események sorozataként. Minden jármű egy külön szimulációs folyamat, amely rendszeres időközönként frissíti az állapotát. A frissítés sorén a jármű értékeli a környezetét, meghozza a szükséges döntéseket és végrehajtja azokat. A motor további feladati a globális események kezelése, mint a balesetek aktiválása, megszüntetése és az időjárási állapotok változása.
+    \item \textit{Vizualizációs réteg}. A szimuláció eredményeinek megjelenítése egy hibrid vizualizációs rendszeren keresztül történik. Egy raszter alapú háttérre épül, amely biztosítja a földrajzi kontextust. A dinamikus objektumokat pedig az OpenGL renderer jeleníti meg.
+    \item \textit{Jelentési réteg}. A rendszer legutolsó komponense az eredmények kiértékelésért felelős réteg. Ez gyűjti össze a szimuláció során keletkező statisztikai adatokat, például az utazási időket, késéseket vagy torlódásokat.
+\end{enumerate}
+\subsection{Térinformatika}
+A szimulációs rendszer alapját a térbeli adatok biztosítják. A járművek mozgása, az útvonal tervezés és a forgalmi események modellezése mind az úthálózat topológiai és geometriai reprezentációjára épülnek. A térinformatikai adatok forrása az OpenStreetMap (OSM), de fontos kiemelni, hogy a OSM adati elsősorban térképi megjelenítésre készülnek, nem pedig mikroszkopikus közlekedési szimulációk számára. A nyers adatok adatfeldolgozáson esnek át, azzal a céllal, hogy egy szimulációra optimalizált hálózati modell jöjjön létre.
+Az adatfeldolgozás folyamata:
+\begin{enumerate}
+    \item az úthálózat és közlekedési objektumok letöltése,
+    \item adatok topológiai és geometriai normalizálása,
+    \item szükséges attribútumok meghatározása,
+    \item közösségi közlekedési megállók illesztése,
+    \item futásidejű hálózati modell létrehozása.
+\end{enumerate}
+\textit{Úthálózat adatai.} Az osmnx könyvtár használatával az OSM adatok és hálózati struktúrák letöltésre kerülnek, egy előre definiált, a bouding box-on belülre eső földrajzi helyre vonatkozóan. A megadott szélességi és hosszúsági koordináták használatával kontrollható a szimulációs terület és a feldolgozandó adatok mennyisége. A letöltött gráf GraphML formátumban kerül mentésre, amely már tartalmazza a gráfhoz tartozó topológiai és geometriai információkat. A buszmegállók pontszerű objektumok, melyek különböző címkékkel vannak ellátva.
+\\
+\\
+\textit{Úthálózat előfeldolgozása.} AZ OSM adatok WGS84, földrajzi koordináta rendszerben vannak tárolva, ahol a koordináták fokokban vannak megadva. Az előfeldolgozás az alábbi műveletek hajtódnak végre:
+\begin{itemize}
+    \item csúcsok és élek azonosítása,
+    \item geometriai koordináták vetítése metrikus térbe,
+    \item élhossz kiszámítása,
+    \item sebesség attribútum meghatározása,
+    \item sávszám meghatározása,
+    \item élek egyedi azonosítójának létrehozása.
+\end{itemize}
+
+\textit{Koordináták vetítése metrikus térbe.} A szimulációs rendszerben a járművek mozgása metrikus koordináta rendszerben történik, ahol a távolságok és pozíciók méterben értendőek. Ahhoz, hogy a szimulációhoz szükséges és fontos mennyiségek (útszakaszok hossza, járművek közötti táv, járművek pozíciója) meghatározhatóak legyenek, a koordinátáknak síkbeli és lineáris mértékegységeknek kell lenniük. Ehhez a Web Mercator (EPSG:3857) vetítést alkalmazza a rendszer:
+$$x = R \cdot \lambda$$$$y = R \cdot \ln \left[ \tan \left( \frac{\pi}{4} + \frac{\phi}{2} \right) \right]$$
+ahol
+\begin{itemize}
+    \item R a Föld sugara,
+    \item $\lambda$ a hosszúsági koordináta radiánban,
+    \item $\phi$ a szélességi koordináta radiánban.
+\end{itemize}
+
+A transzformáció eredményeként a koordináták egy síkbeli térben jelennek. A vetítés lehetővé teszi
+\begin{itemize}
+    \item az útszakaszok hosszának pontos kiszámítását, mivel a koordináták már pontok, így euklideszi távolságként számolhatók,
+    \item a járművek mozgásának stabilitását, mivel a mikroszkopikus modellben a járművek pozíciója gyakran, kis léptekben változik,
+    \item az OSM raszteres térkép tile-ok használatát, mivel az és a Google Maps is az EPSG:3857 koordináta rendszert alkalmazza \cite{ref8} \cite{ref9}.
+\end{itemize}
+\textit{Útszakaszok geometriai reprezentációja.} Az OSM adatokban az útszakaszok gyakran több pontból álló poligonok. Ezen geometriai információk megőrzése fontosa a jármű pozíciók pontos meghatározásakor, a járművek orientációjának kiszámításakor és vizuális megjelenítéskor.
+\\
+\\
+\textit{Él attribútumok meghatározása}. Az egyik legfontosabb attribútum az útszakasz hossza, amely a járművek mozgásának alapja. Amennyiben az OSM adatok tartalmaznak maxspeed értéket, akkor a rendszer azt fogja használni, ellenkező esetben lakóutcák esetén alacsonyabb, míg főutak esetén magasabb sebesség kerül becslésre. 
+\\
+\\
+\textit{Élek egyedi azonosítója}. A szimuláció során szükséges, hogy minden útszakasz egyértelműen azonosítható legyen. Ez fontos az útvonaltervezés, balesetek kezelése és járművek mozgásának követése során. Minden élhez az egyedi azonosító a gráf csúcs azonosítójából és az él indexéből áll össze (pl.: 26754864-7772641524-0).
+\\
+\\
+\textit{Buszmegállók}.  Az OSM adatokban a megállók pontszerű objektumok, amelyek nem tartoznak egy konkrét útszakaszhoz. A megállók a legközelebb eső útszakaszhoz illesztődnek, illetve a következő adatok kerülnek elmentésre, annak érdekében, hogy a buszok helyzete egyértelműen meghatározható legyen a szimuláció során:
+\begin{itemize}
+    \item a megálló koordinátái,
+    \item a hozzá tartozó él azonosítója,
+    \item a megálló neve és azonosítója.
+\end{itemize}
+
+A létrehozott hálózati modellt több komponens is használja. A routing algoritmusok ezt a gráfot alkalmazzák a legrövidebb út kiszámolásához, a jármű modellek az útszakaszok mentén mozognak és az élhossz alapján számolható a pozíciójuk. A balesetek egy adott élhez kapcsolódnak, mely súlyát módosítják.
+\subsection{Útvonaltervezés}
+A közlekedési szimulációk egyik alapvető komponense az útvonaltervezés, amely meghatározza, hogy a járművek milyen útvonalon közlekedjenek a hálózaton belül. Ez egy dinamikus folyamat, amely figyelembe veszi a járművezetői viselkedést, a forgalmi eseményeket és a hálózat aktuális állapotát. Vagyis a mechanizmus létrehozásánál, fontos, hogy képes legyen modellezni a valós vezetői viselkedés bizonytalanságait és adaptáló döntéseit.
+\\
+\\
+\textit{Legrövidebb út}. A routing rendszer alapja a legrövidebb út meghatározására szolgáló algoritmus. Ezt a NetworkX könyvtár beépített algoritmusa biztosítja, amely képes súlyozott gráfban meghatározni két csúcs közötti minimális költságű útvonalat. Az algoritmus bemenetei:
+\begin{itemize}
+    \item a kiinduló csomópont,
+    \item cél csomópont,
+    \item élek súlyfüggvénye.
+\end{itemize}
+A számítás eredménye egy csomópontokból álló sorozat, amely reprezentálja az optimális útvonalat. Mivel a szimulációs rendszer nem csomópont, hanem él mentén dolgozik, emiatt a jármű mozgásának alapját egy éllista képzi.
+\\
+\\
+\textit{Járművek útvonaltervezése}. A személygépkocsik útvonaltervezése a szimuláció sorén többször is végrehajtásra kerülhet. A járművek kezdetben meghatározzák a kiindulási pont és cél közötti optimális útvonalat. Ez az útvonal azonban nem feltétlen kerül követésre, mivel a vezetői profiloktól függő tervezési horizontot alkalmaz a szimuláció. A tervezési horizont határozza meg, hogy a jármű egyszerre legfeljebb hány útszakaszt vesz figyelembe a döntései során, vagyis a járművezetők nem a teljes útvonalat optimalizálják, hanem szakaszolva hozzák meg a döntéseiket. A folyamat a következő lépésekből áll:
+\begin{enumerate}
+    \item A jármű meghatározza a legrövidebb utat a jelenlegi pozíció és a célpont között.
+    \item Az útvonal első néhány éle kiválasztásra kerül a tervezési horizont alapján.
+    \item A jármű ezen az útvonalon halad tovább.
+    \item A következő csomópont elérésekor a folyamat ismétlődik.
+\end{enumerate}
+A szimuláció három alapvető vezetési stílust, profilt különböztet meg:
+\begin{itemize}
+    \item kezdő vezető,
+    \item átlagos vezető,
+    \item tapasztalt vezető.
+\end{itemize}
+Ezek a profilok több paraméterben is különböznek egymástól.
+
+
+\begin{table}[ht]
+\centering
+\caption{Vezetői profilok paraméterei}
+\label{tab:driver_profiles}
+\begin{tabularx}{\textwidth}{@{}lXccc@{}} % \textwidth = teljes lapszélesség
+\toprule
+\textbf{Paraméter} & \textbf{Leírás} & \textbf{Kezd.} & \textbf{Átl.} & \textbf{Tap.} \\ \midrule
+\texttt{planning\_horizon\_edges} & Útvonaltervezési horizont (élek száma) & 2 & 5 & 10 \\
+\texttt{wrong\_turn\_chance}      & Téves irányválasztás valószínűsége & 0,22 & 0,08 & 0,02 \\
+\texttt{reroute\_compliance}      & Újratervezési hajlandóság (baleset esetén) & 0,60 & 0,85 & 0,98 \\
+\texttt{v0\_factor}               & Kívánt sebesség szorzója (IDM) & 0,90 & 1,00 & 1,05 \\
+\texttt{headway\_factor}          & Követési időköz szorzója (IDM) & 1,20 & 1,00 & 0,92 \\ \bottomrule
+\end{tabularx}
+\end{table}
+
+\textit{Buszok útvonaltervezése}. A közösségi közlekedési járművek útvonaltervezése eltér a személygépkocsiktól. A buszok egy előre meghatározott megálló listával rendelkeznek, amely a járat útvonalát határozza meg. A busz teljes útvonala a megállók közötti legrövidebb utak összekapcsolásával jön létre. Ez az útvonal statikusabb, mint a személygépkocsiké, mert a megállók sorrendje nem változik.
+\\
+\\
+\textit{Dinamikus újratervezés}. A városi közlekedés  egyik fontos jellemzője, hogy a forgalmi viszony folyamatosan változnak. Balesetek és torlódások jelentősen befolyásolják az optimális útvonalakat. Amikor egy baleset történik, az adott útszakasz súlya jelentősen megnövekszik. Ez azt jelenti, hogy a routing algoritmusok számára az adott él használata rendkívül költséges lesz. A járművek rendszeresen ellenőrzik, hogy a tervezett útvonaluk tartalmaz-e olyan útszakaszt, amelyet incidens érint.Fontos, hogy az érintett  él nem kerül eltávolításra a gráfból, mindössze a routing algoritmus csak akkor választja, ha nincs más opció. Az újra tervezés azonban nem kötelező minden jármű számára, a döntést a vezetési profil befolyásolja.
+\\
+\\
+\textit{Reprodukálhatóság}. A rendszer minden véletlenszerű döntéshez egy seed által kontrollált véletlen szám generátort használ. Azonos paraméterek és seed esetén a szimuláció minden futtatásakor ugyanazt az eredményt adja.
+
+\subsection{Szimulációs motor}
+A szimulációs motor felelős a járművek mozgásáért, forgalmi események és környezeti hatások időbeli kezeléséért. A rendszer alapja egy diszkrét esemény vezérelt szimulációs modell, mellyel végre hajtható több folyamat időbeli ütemezésének és egymásra hatásának modellezése. A rendszer állapota csak meghatározott időpillanatokban, események határásra változik. Esemény lehet egy jármű mozgásának frissítése, egy busz megállóba érkezése, baleset bekövetkezése vagy útvonal újra tervezés.
+\\
+A szimuláció központi eleme a szimulációs környezet. Ez azaz objektum, amely felelős a szimulációs idő kezeléséért és az események ütemezéséért. Egy globális időváltozó tart fenn, amely reprezentálja az aktuális időpillanatot. A szimuláció során minden jármű egy külön folyamat, és ezek a folyamatok futnak egymással párhuzamosan. A motor feladatai:
+\begin{itemize}
+    \item járműfolyamatok létrehozása és kezelése,
+    \item események időbeli kezelése,
+    \item hálózati állapot frissítése,
+    \item környezeti események kezelése,
+    \item szimulációs állapot exportálása a vizuális réteg számára.
+\end{itemize}
+\textit{Szimulációs idő}. A futás közben a szimulációs idő nem folyamatosan, hanem diszkrét lépésekben halad előre. A járművek állapotának frissítése egy rögzített időlépésben történik,
+$$  \Delta t = 0.02s $$
+A szimuláció során, minden jármű folyamat a következő eseményig szünetel, majd a megadott idő elteltével újra aktiválódik. A jármű folyamat felelős a jármű teljes viselkedésének kezeléséért, beleértve a mozgást, döntéshozatalt és a környezeti interakciókat. A folyamat három fázisra bontható:
+\begin{enumerate}
+    \item érzékelés,
+    \item tervezés,
+    \item végrehajtás.
+\end{enumerate}
+\textit{Érzékelés}. Az érzékelés során a jármű információkat gyűjt a környezetéről. A jármű meghatározza:
+\begin{itemize}
+    \item az aktuális útszakaszt,
+    \item a vezető jármű pozícióját,
+    \item a két jármű közötti távolságot,
+    \item a sebességet.
+\end{itemize}
+A jármű ezen kívül ellenőrzi, hogy az aktuális útszakaszt érinti-e baleset.
+\\
+\\
+\textit{Tervezés.} A tervezés során a jármű meghozza következő mozgáshoz szükséges döntéseket. Első lépésként a jármű ellenőrzi, hogy szükséges-e útvonal újratervezése. A következő lépésben a jármű meghatározza a mozgását befolyásoló sebesség korlátokat. Ezek származhatnak:
+\begin{itemize}
+    \item az útszakasz sebesség korlátjából,
+    \item a vezető jármű sebességéből,
+    \item az útvonal geometriájából,
+    \item az időjárási hatásokból.
+\end{itemize}
+\textit{Végrehajtás}. A végrehajtás során a jármű frissíti a mozgási állapotát. Ez a gyorsulás kiszámításából, a sebesség frissítéséből és a pozíció frissítéséből áll. Amikor egy jármű eléri az aktuális útszakasz végét, egy új esemény kövekezik be: az élhatár átlépés. Ekkor a jármű elhagyja az aktuális útszakaszt, belép a következő útszakaszra és frissíti a hálózati foglaltságot. Ez az esemény fontos a vezető jármű meghatározásához és a torlódások modellezéséhez.
+\\
+\\
+A közösségi közlekedési járművek működése további eseményeket vezetnek be. Amikor egy busz eléri a kijelölt buszmegállót, akkor egy várakozási esemény aktiválódik. Ilyenkor egy meghatározott ideig (amely függ a megálló utasforgalmától és az aktuális forgalmi viszonyoktól) nem mozog, ezzel reprezentálva az utas fel és le szállást.
+\\
+A szimuláció során a forgalmi incidensek külön eseményként jelennek meg. A balesetek aktiválása és megszüntetése a szimulációs motor által ütemezett események.
+
+\subsection{Járműmodellek}
+A mikroszkopikus modellekben minden jármű külön entitás, és ezek kölcsönhatásaik alkotják a városi forgalom dinamikáját. A járműmodellek több komponensre alapulnak:
+\begin{itemize}
+    \item jármű állapotának reprezentációja,
+    \item autókövető modell,
+    \item útvonal követése,
+    \item vezetési profilok által meghatározott viselkedési paraméterek.
+\end{itemize}
+A jármű objektum tartalmazza, mindazokat az adatokat, amelyek szükségesek a jármű mozgásának és döntéseinek meghatározásához. A jármű állapota az alábbi információkból áll össze:
+\begin{itemize}
+    \item az aktuális útszakasz azonosítója,
+    \item a jármű pozíciója az útszakasz mentén,
+    \item a jármű sebessége,
+    \item a jármű gyorsulása,
+    \item a tervezett útvonal,
+    \item a járművezetői profil.
+\end{itemize}
+A jármű pozíciója nem globális, hanem az adott útszakasz mentén megtett távolságként kerül elmentésre. A jármű viselkedését befolyásoló autó követési modell paramétereit és a vezetési profilhoz tartozó döntési tényezőket is tartalmazza az objektum.
+\\
+A szimulációban az autókövető viselkedést az Intelligent Driver Model (IDM) írja le. A modell alapelve, hogy a jármű gyorsulása a kívánt sebességtől és a követési távolságtól függ. Ha a jármű előtt nincs akadály, akkor az fokozatosan gyorsít a kívánt sebesség irányába. Ha azonban egy jármű található előtte, akkor a modell figyelembe veszi a követési távolságot. A gyorsulás számítása során az IDM törekszik egyensúlyt tartani a sebességnövelési törekvés és a biztonságos követési távolság fenntartása közt.
+\\
+A korábban említett vezetési profilok egyik fontos viselkedési eleme a téves irányválasztás. Egy valószínűségi paraméter segítségével bizonyos esetekben a jármű eltérhet az optimális útvonaltól, és egy másik irányt választ. Ha a jármű útvonalán baleset, vagy torlódás jelenik meg, akkor dönthet arról, hogy új útvonalat keres.
+\\
+A járműmodellek paraméterei az időjárási körülmények hatására módosulhatnak. Esős vagy havas időben a követési távolság megnövekedhet, és a járművek lasabban gyorsíthatnak.
+\subsection{Vizualizáció}
 \section{Irodalomjegyzék}
-
 \begin{thebibliography}{9}
 	
 	\bibitem{ref1}
@@ -347,6 +533,17 @@ Röviden, tömören és világosan ismertetni kell a fontosabb megállapítások
 	Qiu, L., Nixon, W. A. (2008).
 	Effects of Adverse Weather on Traffic Crashes: Systematic Review and Meta-Analysis.
 	\textit{Transportation Research Record, 2055, 139–146.}
+    
+    \bibitem{ref8}
+    Google. \textit{Map and Tile Coordinates}.
+    Elérhető:
+    \\
+    \url{https://developers.google.com/maps/documentation/javascript/coordinates}
+
+    \bibitem{ref9}
+    OpenStreetMap. \textit{Web Mecator}.
+    Elérhető: 
+    \\ \url{https://wiki.openstreetmap.org/wiki/Web_Mercator#:~:text=EPSG:3857%20is%20a%20Spherical,as%20Google%20and%20later%20OpenStreetMap.}
 	
 	
 	
