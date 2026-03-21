@@ -7,5 +7,5 @@ Candidate: _Dáné Bence Dávid_
 
 Supervisor: _Prof. Dr. Ispány Márton_
 
-Read the thesis (in hungarian language) [here](https://github.com/danebencedavid/Data-Science-MSc-Thesis/blob/main/docs/main.pdf)!
+Read the thesis (in hungarian language) [here](https://danebencedavid.github.io/Data-Science-MSc-Thesis/docs/main.pdf)!
 
