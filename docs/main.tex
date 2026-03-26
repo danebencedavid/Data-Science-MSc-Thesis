@@ -15,9 +15,11 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{comment}
-\usepackage{url}
+\usepackage{xurl}
 \usepackage{booktabs}
+\usepackage{subcaption}
 \usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
 
 % Címlaphoz pozícionáláshoz
 \usepackage{tikz}
@@ -70,8 +72,22 @@ Prof. Dr. Ispány Márton
 
 \newpage
 
+\newpage
+\thispagestyle{plain}
+\begin{center}
+    \huge \textbf{Köszönetnyilvánítás}
+\end{center}
+
+\vspace{1cm}
+
+Ezúton szeretnék köszönetet mondani témavezetőmnek, Prof. Dr. Ispány Márton tanár úrnak a sok segítségért, amellyel hozzájárult ennek a diplomamunkának a létrejöttéhez.
+
+Hálával tartozom szüleimnek a rengeteg gondoskodásért és támogatásért, amely végigkísért tanulmányaim során.
+
+\newpage
 
 \setcounter{page}{1} % oldalszám 1-től a tartalomjegyzéknél
+
 \tableofcontents
 
 \newpage
@@ -83,9 +99,9 @@ A növekvő urbanizáció következményeként a városi közlekedés egy össze
 \\
 A városi közlekedés szimulációja kiemelten fontos, mert segítségével megérthetők, magyarázhatók és előre jelezhetők olyan jelenségek, mint a forgalmi torlódások vagy a közösségi közlekedés járműveinek késései és azok következményei. Egy jármű vagy esemény hatása nem triviális, és gyakran kihat a teljes hálózatra.
 \\
-Az adatalapú, szimuláción alapuló megközelítés nemcsak technikai kihívást jelent, hanem kiváló lehetőség egy rendszerszintű szemlélet kialakítására is. A városi közlekedés ugyanis nem csupán járművek mozgását jelenti, hanem összefonódik az emberek napi rutinjával, a gazdasággal, az időjárással, az eseményekkel, valamint a város tervezésének és irányításának kérdéseivel is.
+Az adatalapú megközelítés nemcsak technikai kihívás, hanem kiváló lehetőség egy rendszerszintű szemlélet kialakítására is. A városi közlekedés ugyanis nem csupán járművek mozgását jelenti, hanem összefonódik az emberek napi rutinjával, a gazdasággal, az időjárással, az eseményekkel, valamint a város tervezésének és irányításának kérdéseivel is.
 \\
-Ezért egy olyan szimulációs rendszer, amely a valósághoz közelítő módon modellezi a járművek – különösen a közösségi közlekedési járművek – viselkedését, késéseit, valamint a forgalmi eseményekre adott reakcióit, nemcsak tudományos szempontból érdekes, hanem valós alkalmazási lehetőségeket is kínál. Az ilyen modellek és szimulációk hozzájárulhatnak a döntéshozatal támogatásához, a várostervezés fejlesztéséhez, valamint a közlekedésirányítás optimalizálásához.
+Ezért egy olyan szimulációs rendszer, amely a valósághoz közelítő módon modellezi a járművek, különösen a közösségi közlekedési járművek viselkedését, késéseit, valamint a forgalmi eseményekre adott reakcióit, nemcsak tudományos szempontból érdekes, hanem valós alkalmazási lehetőségeket is kínál. Az ilyen modellek és szimulációk hozzájárulhatnak a döntéshozatal támogatásához, a várostervezés fejlesztéséhez, valamint a közlekedésirányítás optimalizálásához.
 \subsection{Formális követelmények}
 A diplomamunka célja egy adat által irányított, városi közlekedést modellező szimulációs rendszer létrehozása ami különösen hangsúlyozza a közösségi közlekedésjárművek, buszok és villamosok viselkedését, hálózati hatásait és késések terjedését.
 A dolgozat középponti kérdései a következők: hogyan lehet különféle forrásból (pl. OpenStreetMap, GTFS) származó adatokat egyesíteni és feldolgozni úgy, hogy azok alapként szolgálhassanak egy valóságszerű közlekedési szimulációhoz? Miként képes egy közlekedési jármű késése - akár pár perces is -, láncreakciót okozni a teljes hálózaton? Hogyan lehet ezt a hatást modellezni és vizualizálni?
@@ -108,7 +124,7 @@ $$q = k \cdot v$$
 \end{figure}
 \subsection{Forgalomáramlás modell}
 \subsubsection{Makroszkopikus}
-A makroszkopikus modellek a forgalom áramlását a mozgásban lévő folyadékokhoz vagy gázokhoz hasonlóan írják le. A dinamikai változók lokálisan aggregált mennyiségek, mint például a forgalomsűrűség $p(x,t)$, az áramlás $Q(x,t)$, az átlagsebesség $V(x,t)$.
+A makroszkopikus modellek a forgalom áramlását a mozgásban lévő folyadékokhoz vagy gázokhoz hasonlóan írják le. A dinamikai változók lokálisan aggregált mennyiségek, mint például a forgalomsűrűség $p(x,t)$, az áramlás $Q(x,t)$, az átlagsebesség $V(x,t)$, ahol az $x$ a hely, míg a $t$ az időpillanat.
 Mivel az aggregáció lokális, ezek a mennyiségek általában térben és időben változnak, azaz dinamikus mezőknek felelnek meg. Így a makroszkopikus modellek képesek leírni az olyan kollektív jelenségeket, mint a régiók torlódása vagy forgalmi hullámok. Továbbá, a makroszkopikus modellek hasznosak,
 \begin{itemize}
     \item ha nem szükséges figyelembe venni olyan hatásokat, amelyeket makroszkopikusan nehéz leírni (pl. sávváltások, többféle vezető-jármű típus),
@@ -117,8 +133,8 @@ Mivel az aggregáció lokális, ezek a mennyiségek általában térben és idő
 Egy makroszkopikus forgalom leírásban nem az egyedi járműveket írják le, hanem az egyes útszakaszok aggregált változóit. Azaz meg lehet határozni a sűrűséget, vagyis azt, hogy a járművek mennyire közel vannak egymáshoz térben, az áramlást, azaz az időegységenként egy referencia ponton áthaladó járművek számát és leírható a járművek átlagsebessége egy útszakaszon.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.5\linewidth]{Screenshot 2025-06-19 180354}
-    \caption{Makroszkopikus modell. \cite{ref2}.}
+    \includegraphics[width=.5\linewidth]{Screenshot 2026-03-26 121605.png}
+    \caption{Makroszkopikus modell. Az különböző zöld árnyalatok a forgalomsűrűség térbeli $x$ és időbeli $t$ változását szemlélteti\cite{ref2}.}
     \label{fig:makro-model}
 \end{figure}
 \subsubsection{Mikroszkopikus}
@@ -132,12 +148,12 @@ A mikroszkopikus modellek, beleértve az autókövető modelleket, az egyéni j�
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=.55\linewidth]{micro-fig}
-	\caption{Mikroszkopikus modell. \cite{ref2}}
+	\caption{Mikroszkopikus modell. Minden jármű egyedi entitás, a $v_{\alpha}(t)$ mennyiség az adott autó egyedi sebessége $t$ időpillanatban \cite{ref2}.}
 	\label{fig:micro-fig}
 \end{figure}
 A megfelelő modell, vagy modellek kiválasztásakor (mezoszkopikus modell, amely ötvözi a mikroszkopikus és makroszkopikus megközelítéseket) az alábbi tényezők is szerepet játszanak:
 \begin{itemize}
-	\item \textit{Heurisztikus} és \textit{Alapelven nyugvó} modellek.  A \textit{heurisztikus modellek} egyszerű matematikai megközelítést használnak, ahol az együtthatók a modellparaméterek szerepét töltik be. Ezeket az adatokat például regressziós technikákkal illesztik, és általában nincs intuitív jelentésük. Ezzel szemben az \textit{alapelveken nyugvó modelleket} bizonyos szükségességekből vezetik le. Autókövető modellek esetében ez lehet egy olyan vezetési viselkedés, amelyet a sebességre, gyorsulásra, lassulásra, időbeli követési távolságra és minimális távolságra vonatkozó kívánt értékek határoznak meg. Ideális esetben ezen szükségességek mindegyike egy modellparaméterben tükröződik, amelynek értéke ezáltal intuitív jelentéssel bír.
+	\item \textit{Heurisztikus} és \textit{Első elveken nyugvó} modellek.  A \textit{heurisztikus modellek} matematikai megközelítést használnak, ahol az együtthatók a modellparaméterek szerepét töltik be. Ezeket az adatokat regressziós technikákkal illesztik, és nincs intuitív jelentésük. Ezzel szemben az \textit{első elveken nyugvó modelleket} bizonyos kényszerekből vezetik le. Autókövető modellek esetében ez lehet egy olyan vezetési viselkedés, amelyet a sebességre, gyorsulásra, lassulásra, időbeli követési távolságra és minimális távolságra vonatkozó kívánt értékek határoznak meg. Ideális esetben ezen kényszerek mindegyike egy modellparaméterben tükröződik, amelynek értéke ezáltal intuitív jelentéssel bír.
 	\item \textit{Sztochasztikus} és \textit{Determinisztikus} modellek. A véletlen elemek felhasználhatók a forgalomáramlás olyan aspektusainak leírására, amelyek ismeretlenek, mérhetetlenek, modellezhetetlenek, vagy „valóban” véletlenszerűek. Míg a véletlen elemeket nem tartalmazó modelleket \textit{determinisztikus} modelleknek nevezzük, addig azokat, amelyek véletlen elemeket (sztochasztikus tagokat) tartalmaznak, \textit{sztochasztikus} modelleknek hívjuk.A véletlenszerűség a modell különböző pontjain előfordulhat:
 	\begin{itemize}
 		\item gyorsulási zaj, amely a emberi viselkedés kiszámíthatatlanságát modellezi
@@ -496,6 +512,58 @@ A korábban említett vezetési profilok egyik fontos viselkedési eleme a téve
 \\
 A járműmodellek paraméterei az időjárási körülmények hatására módosulhatnak. Esős vagy havas időben a követési távolság megnövekedhet, és a járművek lasabban gyorsíthatnak.
 \subsection{Vizualizáció}
+A valós idejű vizualizáció lehetővé teszi a szimuláció követését és az eredmények elemzését. A környezet megjeleníti a járműveket és azok mozgását, a buszmegállókat, útvonalakat és az előforduló forgalmi eseményeket.
+A megjelenítés egy adott sorrendben történik, annak érdekében, hogy minden elem jól látható legyen. A sorrend:
+\begin{enumerate}
+    \item statikus térkép mint háttér,
+    \item járművek,
+    \item közlekedési megállók,
+    \item forgalmi incidensek,
+    \item útvonalak
+    \item felhasználói felület.
+\end{enumerate}
+
+Ezt követve biztosított, hogy a dinamikus elemek ne vesszenek el a háttérben.
+\\
+Járművek megjelenítése nem pontokként történik, hanem egy ikon használatával, amely a jármű helyzete mellett a haladási irányt is reprezentálja. Annak érdekében, hogy a mozgás folyamatosan legyen, a jármű előző és aktuális (útszakaszon mért) pozíciói között interpoláció történik.
+\\
+Kiválasztott jármű esetén a jármű teljes útvonala kirajzolódik, ha forgalmi eseménybe ütközik, akkor nem csak az érintett útszakasz kerül vizualizálásra, de a jármű újra tervezett útvonala is. Megállók kiválasztásával megtudható az adott megálló neve, az ott várakozó utasok száma és az azon buszjáratok száma, amelyek érintik a megállót. Ugyanígy a buszok kijelölésekor megtudható a járat száma, jelenlegi státusza (tranzit, vagy várakozás), sebessége és az útvonalat alkotó buszmegállók.
+\begin{figure}[H]
+     \centering
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{Screenshot 2026-03-26 130135.png}
+         \caption{Buszmegálló információ.}
+         \label{fig:bust-stop}
+     \end{subfigure}
+     \hfill
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \includegraphics[width=\textwidth]{Screenshot 2026-03-26 130438.png}
+         \caption{Busz információi.}
+         \label{fig:bus-info}
+     \end{subfigure}
+     \label{fig:comparison}
+\end{figure}
+A rendszer felülete tartalmazza a szimuláció indítását, különböző szcenárió választását és saját beállítását. A rendszer képes headless, azaz grafikus megjeleníts nélkül is futni. Ekkor a szimuláció végeztével egy jelentés készül, amely tartalmazza a következő információkat:
+\begin{itemize}
+    \item szcenárió neve,
+    \item futási  idő
+    \item seed mód (fix, vagy random)
+    \item össze ágens száma (autók és buszok)
+    \item bekövetkezett balesetek száma
+    \item buszmegálló események
+    \item átlagos, medián, minimum, maximum megállási idő (dwell time)
+    \item P50, P75, P90, P95 megállási idő percentilisek
+    \item átlagos és késés
+    \item járművet érintő balesetek száma
+    \item időjárási állapot
+\end{itemize}
+Az alábbi linken megtekinthető egy példa jelentés.
+\\
+\url{https://github.com/danebencedavid/Data-Science-MSc-Thesis/blob/main/docs/example_report.pdf}
+\section{Összefoglalás}
+
 \section{Irodalomjegyzék}
 \begin{thebibliography}{9}
 	
